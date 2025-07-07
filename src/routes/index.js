@@ -1,7 +1,7 @@
-const testRouter = require('./test')
+const LMRouter = require('./linhMuc')
 
 const route = (app) => {
-    app.use(`/test`, testRouter)
+    app.use(`/linhMuc`, LMRouter)
 }
 
 module.exports = route;
