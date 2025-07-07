@@ -22,14 +22,19 @@ const GXController = {
 
         let link = tenGXElement.attr('href') || null;
         if (link && !link.startsWith('http')) {
-          link = baseUrl + '/' + link.replace(/^\/+/, ''); // loại bỏ dấu / đầu nếu có
+          link = baseUrl + '/' + link.replace(/^\/+/, '');
         }
+
+        // 👉 Xử lý giao hạt
+        let giaoHat = $(columns[2]).text().trim();
+        if (giaoHat === 'Hà Nội') giaoHat = 'Chính Tòa';
+        else if (giaoHat === 'Phú Lý') giaoHat = 'Phủ Lý';
 
         const giaoXu = {
           tenGX,
           link,
           tenKhac: $(columns[1]).text().trim(),
-          giaoHat: $(columns[2]).text().trim(),
+          giaoHat,
           diaChi: $(columns[3]).text().trim(),
         };
 
