@@ -18,7 +18,7 @@ const GXController = {
         const columns = $(row).find('td');
 
         const tenGXElement = $(columns[1]).find('a');
-        const tenGX = tenGXElement.text().trim() || $(columns[0]).text().trim();
+        const tenGX = tenGXElement.text().trim() || $(columns[1]).text().trim();
 
         let link = tenGXElement.attr('href') || null;
         if (link && !link.startsWith('http')) {
