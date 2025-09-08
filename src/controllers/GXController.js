@@ -17,7 +17,7 @@ const GXController = {
       rows.slice(1).each((index, row) => {
         const columns = $(row).find('td');
 
-        const tenGXElement = $(columns[0]).find('a');
+        const tenGXElement = $(columns[1]).find('a');
         const tenGX = tenGXElement.text().trim() || $(columns[0]).text().trim();
 
         let link = tenGXElement.attr('href') || null;
@@ -26,16 +26,16 @@ const GXController = {
         }
 
         // 👉 Xử lý giao hạt
-        let giaoHat = $(columns[2]).text().trim();
+        let giaoHat = $(columns[3]).text().trim();
         if (giaoHat === 'Hà Nội') giaoHat = 'Chính Tòa';
         else if (giaoHat === 'Phú Lý') giaoHat = 'Phủ Lý';
 
         const giaoXu = {
           tenGX,
           link,
-          tenKhac: $(columns[1]).text().trim(),
+          tenKhac: $(columns[2]).text().trim(),
           giaoHat,
-          diaChi: $(columns[3]).text().trim(),
+          diaChi: $(columns[4]).text().trim(),
         };
 
         giaoXuList.push(giaoXu);
