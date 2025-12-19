@@ -1,14 +1,57 @@
 const { default: axios } = require("axios");
 const cheerio = require('cheerio');
 
+const checkType = (type) => {
+    switch (type) {
+        case "1":
+            return {
+                url: 'https://www.tonggiaophanhanoi.org/phan-thu-nhat-cac-kinh-doc-sang-toi-ngay-thuong-va-chua-nhat/',
+                idPrefix: '.elementor-element-44cf93ac'
+            };
+        case "2":
+            return {
+                url: 'https://www.tonggiaophanhanoi.org/phan-thu-hai-cac-kinh-cau/',
+                idPrefix: '.elementor-element-5c0f1a5a'
+            };
+        case "3":
+            return {
+                url: 'https://www.tonggiaophanhanoi.org/phan-thu-ba-ngam-cac-phep-lan-hat/',
+                idPrefix: '.elementor-element-138a1027'
+            };
+        case "4":
+            return {
+                url: 'https://www.tonggiaophanhanoi.org/phan-thu-tu-kinh-dang-le-nhung-kinh-don-minh-chiu-le-va-nhung-kinh-cam-on/',
+                idPrefix: '.elementor-element-7c7eb5c6'
+            };
+        case "5":
+            return {
+                url: 'https://www.tonggiaophanhanoi.org/phan-thu-nam-kinh-ngam-dang-thanh-gia-va-it-nhieu-kinh-khac/',
+                idPrefix: '.elementor-element-2ba8d6e8'
+            };
+
+        default:
+            return null;
+    }
+}
+
 const KinhNguyenController = {
     getChiTietKinhNguyen: async (req, res) => {
         try {
             const { contentId } = req.params;
-            const url = 'https://www.tonggiaophanhanoi.org/kinh-phung-vu-le-cac-thanh-tu-dao-viet-nam/';
+            const { type } = req.query;
+            let url;
+            let id;
+            if (!type) {
+                url = 'https://www.tonggiaophanhanoi.org/kinh-phung-vu-le-cac-thanh-tu-dao-viet-nam/';
+                id = "#" + contentId
+            }
+            else {
+                url = checkType(type)?.url;
+                id = checkType(type)?.idPrefix;
+            }
             const { data: html } = await axios.get(url);
             const $ = cheerio.load(html);
-            const contentHtml = $("#" + contentId).html();
+            const contentHtml = $(id).html();
 
             if (!contentHtml) {
                 return res.json({
@@ -66,6 +109,6 @@ const KinhNguyenController = {
             console.error('Lỗi crawl:', error.message);
             return res.status(500).json({ success: false, error: error.message });
         }
-    }
+    },
 }
 module.exports = KinhNguyenController;
