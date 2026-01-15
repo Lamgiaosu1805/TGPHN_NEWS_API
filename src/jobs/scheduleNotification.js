@@ -1,9 +1,9 @@
 const cron = require("node-cron");
 const axios = require("axios");
 
-const PUSH_API = "http://localhost:6789/notification/push/all";
+const PUSH_API = `http://localhost:${process.env.PORT || 3456}/notification/push/all`;
 
-cron.schedule("0 */2 * * *", async () => {
+cron.schedule("*/30 * * * * *", async () => {
     try {
         await axios.post(
             PUSH_API,
