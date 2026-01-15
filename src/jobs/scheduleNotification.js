@@ -3,7 +3,7 @@ const axios = require("axios");
 
 const PUSH_API = `http://localhost:${process.env.PORT || 3456}/notification/push/all`;
 
-cron.schedule("*/30 * * * * *", async () => {
+cron.schedule("0 */2 * * *", async () => {
     try {
         await axios.post(
             PUSH_API,
