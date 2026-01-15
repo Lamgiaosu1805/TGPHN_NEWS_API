@@ -1,24 +1,37 @@
+process.env.TZ = 'Asia/Ho_Chi_Minh';
+require('dotenv').config();
 const express = require('express')
 const app = express()
 const route = require('./src/routes')
 const morgan = require('morgan')
 const cors = require('cors');
-
-require('dotenv').config();
+const db = require('./src/config/connectDB');
 
 //use middlewares
 app.use(morgan('dev'))
 app.use(cors());
 app.use(express.json())
 app.use(express.urlencoded({
-    extended: true
+  extended: true
 }))
 
 //routing
 route(app);
 
-const port = process.env.PORT || 3000
+// Connect to MongoDB và start server
+(async () => {
+  try {
+    await db.connect();
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
-})
+    // Import cron job sau khi DB connect
+    require("./src/jobs/scheduleNotification");
+
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`App listening on port ${port}`);
+    });
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Dừng app nếu DB không connect được
+  }
+})();
