@@ -1,10 +1,10 @@
+const GlobalNotificationSchema = require("../models/GlobalNotificationSchema");
 const PushDeviceSchema = require("../models/PushDeviceSchema");
 const { Expo } = require("expo-server-sdk");
 
 const expo = new Expo();
 
 const NotificationController = {
-
     // ===============================
     // REGISTER DEVICE
     // ===============================
@@ -46,7 +46,7 @@ const NotificationController = {
                     isActive: true,
                     lastActiveAt: new Date(),
                 },
-                { upsert: true, new: true }
+                { upsert: true, new: true },
             );
 
             return res.json({ success: true });
@@ -67,8 +67,8 @@ const NotificationController = {
             }
 
             const messages = tokens
-                .filter(token => Expo.isExpoPushToken(token))
-                .map(token => ({
+                .filter((token) => Expo.isExpoPushToken(token))
+                .map((token) => ({
                     to: token,
                     sound: "default",
                     title,
@@ -97,7 +97,7 @@ const NotificationController = {
                 ) {
                     await PushDeviceSchema.updateOne(
                         { expoPushToken: messages[i].to },
-                        { isActive: false }
+                        { isActive: false },
                     );
                 }
             }
@@ -119,24 +119,51 @@ const NotificationController = {
         try {
             const { title, body, data } = req.body;
 
-            const devices = await PushDeviceSchema.find({
-                isActive: true,
-            });
-
-            if (!devices.length) {
-                return res.status(404).json({ message: "No active devices" });
+            if (!title || !body) {
+                return res.status(400).json({ message: "Missing title or body" });
             }
 
+            // 1. Lưu notification chung
+            const notification = await GlobalNotificationSchema.create({
+                title,
+                body,
+                data,
+            });
+
+            // 2. Lấy danh sách device active
+            const devices = await PushDeviceSchema.find({
+                isActive: true,
+            }).lean();
+
+            if (!devices.length) {
+                return res.json({
+                    success: true,
+                    message: "Notification saved, no active devices",
+                    notificationId: notification._id,
+                });
+            }
+
+            // 3. Tạo message push
             const messages = devices
-                .filter(d => Expo.isExpoPushToken(d.expoPushToken))
-                .map(d => ({
-                    to: d.expoPushToken,
+                .map((d) => d.expoPushToken)
+                .filter((token) => Expo.isExpoPushToken(token))
+                .map((token) => ({
+                    to: token,
                     sound: "default",
                     title,
                     body,
                     data,
                 }));
 
+            if (!messages.length) {
+                return res.json({
+                    success: true,
+                    message: "Notification saved, no valid tokens",
+                    notificationId: notification._id,
+                });
+            }
+
+            // 4. Push Expo
             const chunks = expo.chunkPushNotifications(messages);
             const tickets = [];
 
@@ -145,7 +172,7 @@ const NotificationController = {
                 tickets.push(...ticketChunk);
             }
 
-            // Disable invalid tokens
+            // 5. Disable token invalid
             for (let i = 0; i < tickets.length; i++) {
                 const ticket = tickets[i];
                 if (
@@ -154,7 +181,7 @@ const NotificationController = {
                 ) {
                     await PushDeviceSchema.updateOne(
                         { expoPushToken: messages[i].to },
-                        { isActive: false }
+                        { isActive: false },
                     );
                 }
             }
@@ -162,7 +189,36 @@ const NotificationController = {
             return res.json({
                 success: true,
                 sent: messages.length,
-                tickets,
+                notificationId: notification._id,
+            });
+        } catch (err) {
+            return res.status(500).json({ message: err.message });
+        }
+    },
+    getGlobalNotifications: async (req, res) => {
+        try {
+            const page = Math.max(1, Number(req.query.page) || 1);
+            const limit = Math.min(50, Number(req.query.limit) || 20);
+            const skip = (page - 1) * limit;
+
+            const [items, total] = await Promise.all([
+                GlobalNotificationSchema.find({})
+                    .sort({ publishedAt: -1 }) // mới → cũ
+                    .skip(skip)
+                    .limit(limit)
+                    .lean(),
+
+                GlobalNotificationSchema.countDocuments(),
+            ]);
+
+            return res.json({
+                items,
+                pagination: {
+                    page,
+                    limit,
+                    total,
+                    totalPages: Math.ceil(total / limit),
+                },
             });
         } catch (err) {
             return res.status(500).json({ message: err.message });
