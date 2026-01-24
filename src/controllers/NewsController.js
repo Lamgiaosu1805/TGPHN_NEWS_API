@@ -26,7 +26,7 @@ const NewsController = {
                 News.find(filter)
                     .sort({ lastPublishedAt: -1 }) // 🔥 QUAN TRỌNG
                     .skip(skip)
-                    .limit(limit)
+                    // .limit(limit)
                     .lean(),
 
                 News.countDocuments(filter),
