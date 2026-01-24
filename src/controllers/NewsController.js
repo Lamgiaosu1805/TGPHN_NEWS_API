@@ -1,6 +1,7 @@
 // controllers/NewsController.js
 const axios = require("axios");
 const cheerio = require("cheerio");
+const News = require("../models/NewsSchema");
 
 const NewsController = {
     getNewsList: async (req, res) => {
