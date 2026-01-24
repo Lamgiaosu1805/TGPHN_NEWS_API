@@ -54,7 +54,7 @@ const NewsController = {
     },
     getFeaturedNews: async (req, res) => {
         try {
-            const url = "https://www.tonggiaophanhanoi.org/mobile-app-feeding/";
+            const url = `https://www.tonggiaophanhanoi.org/mobile-app-feeding/?t=${Date.now()}`;
             const { data: html } = await axios.get(url);
             const $ = cheerio.load(html);
 

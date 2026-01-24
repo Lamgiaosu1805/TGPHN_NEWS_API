@@ -5,7 +5,7 @@ const News = require("../models/NewsSchema");
 
 class NewsJobService {
     constructor() {
-        this.sourceUrl = "https://www.tonggiaophanhanoi.org/mobile-app-feeding/";
+        this.sourceUrl = `https://www.tonggiaophanhanoi.org/mobile-app-feeding/?t=${Date.now()}`
         this.lastCheckTime = null;
         this.stats = {
             totalFetched: 0,
@@ -239,7 +239,7 @@ class NewsJobService {
                     formattedDateTime: this.formatDateTime(parsedDate, timeText),
                 });
             });
-
+            // console.log("PÓTTTT", )
             console.log(`\n📊 TỔNG KẾT: Đã tìm thấy ${posts.length} bài viết`);
 
             // Thống kê hình ảnh
