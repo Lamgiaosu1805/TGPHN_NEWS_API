@@ -5,7 +5,7 @@ const News = require("../models/NewsSchema");
 
 class NewsJobService {
     constructor() {
-        this.sourceUrl = `https://www.tonggiaophanhanoi.org/mobile-app-feeding/?t=${Date.now()}`
+        this.sourceUrl = `https://www.tonggiaophanhanoi.org/mobile-app-feeding/?t=${Date.now()}`;
         this.lastCheckTime = null;
         this.stats = {
             totalFetched: 0,
