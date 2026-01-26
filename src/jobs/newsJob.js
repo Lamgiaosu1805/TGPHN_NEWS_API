@@ -11,9 +11,9 @@ class NewsJob {
     start() {
         console.log("🚀 Khởi động job quét tin tức...");
 
-        // Chạy job mỗi phút (giây thứ 0 của mỗi phút)
+        // Chạy job mỗi 5 phút (giây thứ 0 của mỗi 5 phút)
         this.job = cron.schedule(
-            "0 * * * * *",
+            "0 */5 * * * *",
             async () => {
                 await this.execute();
             },
