@@ -45,7 +45,7 @@ const NewsController = {
 
             // 4. Gọi Gemini AI
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-flash-lite",
                 systemInstruction: "Bạn là biên tập viên tin tức Công giáo. Tóm tắt nội dung sau thành 3-5 gạch đầu dòng ngắn gọn, súc tích. Vào thẳng nội dung luôn, không cần phần mở đầu giới thiệu theo phong cách gì"
             });
 

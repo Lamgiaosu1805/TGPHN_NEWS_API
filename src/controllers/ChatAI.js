@@ -50,7 +50,7 @@ const ChatAIController = {
             }
 
             const model = genAI.getGenerativeModel({
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-flash-lite",
                 tools: ChatAIController.tools,
                 systemInstruction: `Bạn là trợ lý tìm kinh Công giáo. 
         - Khi tìm thấy dữ liệu, hãy chỉ trích xuất đúng đoạn kinh người dùng cần.
