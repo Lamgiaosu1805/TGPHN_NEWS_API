@@ -98,6 +98,10 @@ const NewsSchema = new mongoose.Schema(
             default: true,
             index: true,
         },
+        aiSummary: {
+            type: String,
+            default: null,
+        },
     },
     {
         timestamps: true,

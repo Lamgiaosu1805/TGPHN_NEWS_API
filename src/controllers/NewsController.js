@@ -2,8 +2,74 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const News = require("../models/NewsSchema");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GENAI_API_KEY);
 
 const NewsController = {
+    summarizePost: async (req, res) => {
+        try {
+            const { postId } = req.body;
+
+            if (!postId) {
+                return res.status(400).json({ success: false, message: "Thiếu postId" });
+            }
+
+            // 1. Tìm bài viết trong Database
+            const newsItem = await News.findOne({ postId });
+
+            if (!newsItem) {
+                return res.status(404).json({ success: false, message: "Không tìm thấy bài viết trong hệ thống" });
+            }
+
+            // 2. Nếu đã có tóm tắt AI rồi thì trả về luôn (Caching)
+            if (newsItem.aiSummary) {
+                return res.status(200).json({
+                    success: true,
+                    data: { summary: newsItem.aiSummary, isCached: true }
+                });
+            }
+
+            // 3. Nếu chưa có, lấy link từ DB để đi cào nội dung
+            const postUrl = newsItem.link;
+            const { data: html } = await axios.get(postUrl, { timeout: 10000 });
+            const $ = cheerio.load(html);
+
+            // Làm sạch nội dung bài viết
+            $('script, style, .sharedaddy, footer, nav').remove();
+            let mainContent = $(".entry-content").text() ||
+                $(".elementor-widget-theme-post-content").text() ||
+                $("article").text();
+
+            const cleanText = mainContent.replace(/\s+/g, ' ').trim().substring(0, 12000);
+
+            // 4. Gọi Gemini AI
+            const model = genAI.getGenerativeModel({
+                model: "gemini-3-flash-preview",
+                systemInstruction: "Bạn là biên tập viên tin tức Công giáo. Tóm tắt nội dung sau thành 3-5 gạch đầu dòng ngắn gọn, súc tích. Vào thẳng nội dung luôn, không cần phần mở đầu giới thiệu theo phong cách gì"
+            });
+
+            const result = await model.generateContent(cleanText);
+            const aiSummary = result.response.text();
+
+            // 5. Cập nhật lại vào Database để lần sau không tốn phí
+            newsItem.aiSummary = aiSummary;
+            await newsItem.save();
+
+            return res.status(200).json({
+                success: true,
+                data: { summary: aiSummary, isCached: false }
+            });
+
+        } catch (error) {
+            console.error("Lỗi summarizePost:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Lỗi xử lý AI",
+                error: error.message
+            });
+        }
+    },
     getNewsList: async (req, res) => {
         try {
             const page = Math.max(parseInt(req.query.page) || 1, 1);
@@ -502,6 +568,7 @@ const NewsController = {
             });
         }
     },
+
 };
 
 // Hàm helper: Parse srcset string thành mảng các ảnh
