@@ -15,8 +15,6 @@ cron.schedule("0 */2 * * *", async () => {
                 },
             }
         );
-
-        console.log("✅ Push schedule sent");
     } catch (err) {
         console.error("❌ Push schedule failed", err.message);
     }
