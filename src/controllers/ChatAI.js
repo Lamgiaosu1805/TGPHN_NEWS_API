@@ -49,9 +49,8 @@ const ChatAIController = {
                 return res.status(400).json({ success: false, message: "Thiếu nội dung tin nhắn" });
             }
 
-            // Sử dụng gemini-3-flash-preview
             const model = genAI.getGenerativeModel({
-                model: "gemini-3-flash-preview",
+                model: "gemini-2.5-flash",
                 tools: ChatAIController.tools,
                 systemInstruction: `Bạn là trợ lý tìm kinh Công giáo. 
         - Khi tìm thấy dữ liệu, hãy chỉ trích xuất đúng đoạn kinh người dùng cần.
