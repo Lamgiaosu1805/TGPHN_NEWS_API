@@ -46,7 +46,20 @@ class NewsJobService {
     // Lấy tin tức từ website - DÙNG CÙNG LOGIC VỚI CONTROLLER
     async fetchNewsFromWebsite() {
         try {
-            const { data: html } = await axios.get(this.sourceUrl);
+            const freshUrl = `https://www.tonggiaophanhanoi.org/mobile-app-feeding/?v=${Math.random().toString(36).substring(7)}`;
+
+            const { data: html } = await axios.get(freshUrl, {
+                headers: {
+                    // Giả lập trình duyệt Chrome thật
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                    'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
+                    'Referer': 'https://www.tonggiaophanhanoi.org/',
+                    'Upgrade-Insecure-Requests': '1',
+                    // Bỏ bớt Pragma và Expires nếu vẫn bị 403, chỉ dùng t= hoặc v= là đủ để qua mặt cache
+                },
+                timeout: 15000 // Thêm timeout để tránh treo job
+            });
             const $ = cheerio.load(html);
 
             const newsContainer = $("#tin-moi-nhan-maf");
