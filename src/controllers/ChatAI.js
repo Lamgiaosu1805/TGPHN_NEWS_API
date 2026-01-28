@@ -12,7 +12,7 @@ const ChatAIController = {
     tools: [{
         functionDeclarations: [{
             name: "find_prayer_in_db",
-            description: "Tra cứu nội dung kinh nguyện trong database.",
+            description: "Tra cứu nội dung kinh nguyện hoặc nghi thức trong database.",
             parameters: {
                 type: "OBJECT",
                 properties: {
@@ -49,18 +49,16 @@ const ChatAIController = {
             if (cachedReply) return res.json({ success: true, reply: JSON.parse(cachedReply), fromCache: true });
 
             const model = genAI.getGenerativeModel({
-                // Đổi sang 1.5-flash để tránh lỗi cạn kiệt quota 20 lượt của bản 2.5
                 model: "gemini-2.5-flash-lite",
                 tools: ChatAIController.tools,
-                systemInstruction: `Con là "Trợ lý AI TGP Hà Nội".
-                QUY TẮC PHẢN HỒI:
-                1. TUYỆT ĐỐI KHÔNG chào hỏi, không giới thiệu dẫn dắt (vd: Không nói "Thưa Quý ông bà", "Con xin gửi").
-                2. VÀO THẲNG NỘI DUNG: Hiển thị ngay tiêu đề và nội dung bài kinh người dùng yêu cầu.
-                3. XỬ LÝ KINH DÀI:
-                   - Nếu bài kinh ngắn: Hiển thị toàn văn trang trọng.
-                   - Nếu bài kinh quá dài (như các kinh ngắm, nghi thức): Chỉ trích đoạn đầu (khoảng 300-500 chữ), sau đó kết thúc bằng: "*(Kinh còn dài, Quý ông bà/anh chị vui lòng xem toàn văn tại mục [Kinh Nguyện] trong ứng dụng)*".
-                4. Xưng hô: Nếu bắt buộc phải giải thích, dùng "Con" và "Quý ông bà/anh chị".
-                5. Chỉ trả lời các vấn đề liên quan đến Công giáo.`
+                systemInstruction: `Xưng hô: Con luôn luôn xưng là "Con" và gọi người dùng là "Quý ông bà/anh chị".
+                Danh tính: Con là "Trợ lý AI TGP Hà Nội".
+                Nhiệm vụ:
+                - Chỉ hỗ trợ tìm kinh và các vấn đề Công giáo. Chặn mọi chủ đề thế tục, chính trị, giải trí.
+                - Khi tìm kinh, BẮT BUỘC dùng 'find_prayer_in_db', bỏ lời dẫn nhập và vào trực tiếp nội dung kinh tìm được từ find_prayer_in_db.
+                - Nếu kết quả từ database chứa nhiều bài kinh hoặc quá dài, con phải TRÍCH XUẤT CHÍNH XÁC bài kinh người dùng yêu cầu để hiển thị. 
+                - Nếu kinh quá dài (vượt quá khả năng hiển thị), con trích đoạn đầu trang trọng và chỉ mục người dùng xem toàn văn tại: [Kinh Nguyện] > [Tên bài kinh].
+                - Giọng văn: Khiêm nhường, lễ phép, trang trọng.`
             });
 
             const chat = model.startChat({ history: history });
@@ -72,6 +70,7 @@ const ChatAIController = {
             if (call && call.name === "find_prayer_in_db") {
                 const { keyword } = call.args;
 
+                // Tìm kiếm linh hoạt như code cũ
                 const data = await Prayer.findOne(
                     {
                         $or: [
@@ -84,10 +83,16 @@ const ChatAIController = {
 
                 if (data) {
                     let fullContent = ChatAIController.formatContent(data.html);
+                    let processedContent = fullContent;
+                    let isTooLong = fullContent.length > 3500;
 
-                    // Gửi một phần dữ liệu cho AI để tiết kiệm token và tránh quá tải hiển thị
-                    let isTooLong = fullContent.length > 2500;
-                    let processedContent = isTooLong ? fullContent.substring(0, 2500) : fullContent;
+                    // Logic cắt đoạn thông minh bao quanh keyword để AI luôn thấy nội dung cần trích xuất
+                    if (isTooLong) {
+                        const idx = fullContent.toLowerCase().indexOf(keyword.toLowerCase());
+                        const start = Math.max(0, idx - 500);
+                        const end = Math.min(fullContent.length, idx + 3000);
+                        processedContent = fullContent.substring(start, end);
+                    }
 
                     const finalResult = await chat.sendMessage([{
                         functionResponse: {
@@ -95,7 +100,7 @@ const ChatAIController = {
                             response: {
                                 title: data.title,
                                 content: processedContent,
-                                isDataTruncated: isTooLong, // Báo hiệu cho AI biết là dữ liệu gốc còn dài
+                                isLong: isTooLong,
                                 searchKeyword: keyword
                             }
                         }
@@ -106,7 +111,7 @@ const ChatAIController = {
 
                     return res.json({ success: true, reply: replyText });
                 } else {
-                    const failReply = "Dạ, con không tìm thấy bài kinh này trong hệ thống. Quý ông bà/anh chị có thể kiểm tra lại tên bài kinh ạ.";
+                    const failReply = "Dạ, con đã cố gắng tìm kiếm nhưng hiện tại không thấy bài kinh này trong tư liệu chính thức của TGP ạ.";
                     return res.json({ success: true, reply: failReply });
                 }
             }
@@ -114,20 +119,8 @@ const ChatAIController = {
             res.json({ success: true, reply: response.text() });
 
         } catch (error) {
-            console.error('Lỗi Chat AI:', error.message);
-
-            // Bắt lỗi vượt quá giới hạn (Quota Exceeded)
-            if (error.message.includes('429')) {
-                return res.status(200).json({
-                    success: true,
-                    reply: "Dạ, hiện tại số lượt yêu cầu AI đang quá tải (vượt định mức miễn phí). Quý ông bà/anh chị vui lòng thử lại sau giây lát hoặc tra cứu trực tiếp trong mục Kinh Nguyện ạ."
-                });
-            }
-
-            res.status(500).json({
-                success: false,
-                reply: "Dạ, hệ thống đang gặp gián đoạn kỹ thuật, xin lỗi Quý vị về sự bất tiện này."
-            });
+            console.error('Lỗi:', error.message);
+            res.status(500).json({ success: false, reply: "Dạ, con đang gặp chút gián đoạn kỹ thuật, xin quý vị thử lại sau ạ." });
         }
     }
 };
