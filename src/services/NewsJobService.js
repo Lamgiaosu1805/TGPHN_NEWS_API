@@ -114,9 +114,9 @@ class NewsJobService {
                     .first();
 
                 if (thumbnailImg.length > 0) {
-                    console.log(
-                        `\n=== Xử lý ảnh cho bài ${index + 1}: "${title.substring(0, 50)}..." ===`,
-                    );
+                    // console.log(
+                    //     `\n=== Xử lý ảnh cho bài ${index + 1}: "${title.substring(0, 50)}..." ===`,
+                    // );
 
                     // PHƯƠNG PHÁP QUAN TRỌNG NHẤT: Phân tích srcset để lấy ảnh lớn nhất
                     const srcset = thumbnailImg.attr("srcset");
@@ -158,9 +158,9 @@ class NewsJobService {
                         const dataSrc = thumbnailImg.attr("data-src");
                         if (dataSrc && this.isValidImageUrl(dataSrc)) {
                             largestImageUrl = dataSrc;
-                            console.log(
-                                `✅ Lấy từ data-src: ${largestImageUrl.substring(0, 100)}...`,
-                            );
+                            // console.log(
+                            //     `✅ Lấy từ data-src: ${largestImageUrl.substring(0, 100)}...`,
+                            // );
                         }
                     }
 
@@ -181,9 +181,9 @@ class NewsJobService {
 
                     // PHƯƠNG PHÁP 4: Nếu vẫn là thumbnail, thử chuyển đổi
                     if (largestImageUrl && largestImageUrl.includes("-300x")) {
-                        console.log(
-                            `⚠️  Ảnh hiện tại là thumbnail, thử chuyển sang ảnh lớn hơn...`,
-                        );
+                        // console.log(
+                        //     `⚠️  Ảnh hiện tại là thumbnail, thử chuyển sang ảnh lớn hơn...`,
+                        // );
 
                         // Thử tìm ảnh lớn hơn bằng cách thay đổi kích thước
                         const largerImage = this.findLargerImageFromThumbnail(
@@ -192,9 +192,9 @@ class NewsJobService {
                         );
                         if (largerImage) {
                             largestImageUrl = largerImage;
-                            console.log(
-                                `✅ Đã tìm thấy ảnh lớn hơn: ${largerImage.substring(0, 100)}...`,
-                            );
+                            // console.log(
+                            //     `✅ Đã tìm thấy ảnh lớn hơn: ${largerImage.substring(0, 100)}...`,
+                            // );
                         }
                     }
                 }
@@ -205,9 +205,9 @@ class NewsJobService {
                         largestImageUrl,
                         this.sourceUrl,
                     );
-                    console.log(
-                        `🔗 URL cuối cùng: ${largestImageUrl.substring(0, 120)}...`,
-                    );
+                    // console.log(
+                    //     `🔗 URL cuối cùng: ${largestImageUrl.substring(0, 120)}...`,
+                    // );
                 } else {
                     console.log("❌ Không tìm thấy hình ảnh");
                 }
@@ -253,7 +253,7 @@ class NewsJobService {
                 });
             });
             // console.log("PÓTTTT", )
-            console.log(`\n📊 TỔNG KẾT: Đã tìm thấy ${posts.length} bài viết`);
+            // console.log(`\n📊 TỔNG KẾT: Đã tìm thấy ${posts.length} bài viết`);
 
             // Thống kê hình ảnh
             const imageStats = {

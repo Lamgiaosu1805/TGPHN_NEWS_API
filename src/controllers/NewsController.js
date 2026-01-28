@@ -184,9 +184,9 @@ const NewsController = {
                     .first();
 
                 if (thumbnailImg.length > 0) {
-                    console.log(
-                        `\n=== Xử lý ảnh cho bài ${index + 1}: "${title.substring(0, 50)}..." ===`,
-                    );
+                    // console.log(
+                    //     `\n=== Xử lý ảnh cho bài ${index + 1}: "${title.substring(0, 50)}..." ===`,
+                    // );
 
                     // PHƯƠNG PHÁP QUAN TRỌNG NHẤT: Phân tích srcset để lấy ảnh lớn nhất
                     const srcset = thumbnailImg.attr("srcset");
@@ -228,9 +228,9 @@ const NewsController = {
                         const dataSrc = thumbnailImg.attr("data-src");
                         if (dataSrc && isValidImageUrl(dataSrc)) {
                             largestImageUrl = dataSrc;
-                            console.log(
-                                `✅ Lấy từ data-src: ${largestImageUrl.substring(0, 100)}...`,
-                            );
+                            // console.log(
+                            //     `✅ Lấy từ data-src: ${largestImageUrl.substring(0, 100)}...`,
+                            // );
                         }
                     }
 
@@ -247,9 +247,9 @@ const NewsController = {
 
                     // PHƯƠNG PHÁP 4: Nếu vẫn là thumbnail, thử chuyển đổi
                     if (largestImageUrl && largestImageUrl.includes("-300x")) {
-                        console.log(
-                            `⚠️  Ảnh hiện tại là thumbnail, thử chuyển sang ảnh lớn hơn...`,
-                        );
+                        // console.log(
+                        //     `⚠️  Ảnh hiện tại là thumbnail, thử chuyển sang ảnh lớn hơn...`,
+                        // );
 
                         // Thử tìm ảnh lớn hơn bằng cách thay đổi kích thước
                         const largerImage = findLargerImageFromThumbnail(
@@ -258,9 +258,9 @@ const NewsController = {
                         );
                         if (largerImage) {
                             largestImageUrl = largerImage;
-                            console.log(
-                                `✅ Đã tìm thấy ảnh lớn hơn: ${largerImage.substring(0, 100)}...`,
-                            );
+                            // console.log(
+                            //     `✅ Đã tìm thấy ảnh lớn hơn: ${largerImage.substring(0, 100)}...`,
+                            // );
                         }
                     }
                 }
@@ -268,9 +268,9 @@ const NewsController = {
                 // Chuyển URL relative thành absolute nếu cần
                 if (largestImageUrl) {
                     largestImageUrl = convertToAbsoluteUrl(largestImageUrl, url);
-                    console.log(
-                        `🔗 URL cuối cùng: ${largestImageUrl.substring(0, 120)}...`,
-                    );
+                    // console.log(
+                    //     `🔗 URL cuối cùng: ${largestImageUrl.substring(0, 120)}...`,
+                    // );
                 } else {
                     console.log("❌ Không tìm thấy hình ảnh");
                 }
@@ -313,7 +313,7 @@ const NewsController = {
                 });
             });
 
-            console.log(`\n📊 TỔNG KẾT: Đã tìm thấy ${posts.length} bài viết`);
+            // console.log(`\n📊 TỔNG KẾT: Đã tìm thấy ${posts.length} bài viết`);
 
             // Xử lý và format lại thời gian
             const processedPosts = posts.map((post) => {
@@ -405,27 +405,27 @@ const NewsController = {
                 },
             };
 
-            console.log("\n📈 THỐNG KÊ HÌNH ẢNH");
-            console.log(`Tổng bài viết: ${imageStats.total}`);
-            console.log(`Có hình ảnh: ${imageStats.hasImage}`);
-            console.log(`Chiều rộng trung bình: ${imageStats.averageWidth}px`);
-            console.log(`Ảnh nhỏ (<500px): ${imageStats.imagesByWidth.small}`);
-            console.log(
-                `Ảnh trung bình (500-999px): ${imageStats.imagesByWidth.medium}`,
-            );
-            console.log(`Ảnh lớn (≥1000px): ${imageStats.imagesByWidth.large}`);
+            // console.log("\n📈 THỐNG KÊ HÌNH ẢNH");
+            // console.log(`Tổng bài viết: ${imageStats.total}`);
+            // console.log(`Có hình ảnh: ${imageStats.hasImage}`);
+            // console.log(`Chiều rộng trung bình: ${imageStats.averageWidth}px`);
+            // console.log(`Ảnh nhỏ (<500px): ${imageStats.imagesByWidth.small}`);
+            // console.log(
+            //     `Ảnh trung bình (500-999px): ${imageStats.imagesByWidth.medium}`,
+            // );
+            // console.log(`Ảnh lớn (≥1000px): ${imageStats.imagesByWidth.large}`);
 
             // Kiểm tra một vài ảnh đầu tiên
-            console.log("\n🔍 KIỂM TRA ẢNH (3 bài đầu)");
-            processedPosts.slice(0, 3).forEach((post, i) => {
-                console.log(`${i + 1}. "${post.title.substring(0, 50)}..."`);
-                console.log(
-                    `   Ảnh: ${post.image ? post.image.substring(0, 100) + "..." : "Không có"}`,
-                );
-                console.log(
-                    `   Width: ${post.imageWidth ? post.imageWidth + "px" : "Không xác định"}`,
-                );
-            });
+            // console.log("\n🔍 KIỂM TRA ẢNH (3 bài đầu)");
+            // processedPosts.slice(0, 3).forEach((post, i) => {
+            //     console.log(`${i + 1}. "${post.title.substring(0, 50)}..."`);
+            //     console.log(
+            //         `   Ảnh: ${post.image ? post.image.substring(0, 100) + "..." : "Không có"}`,
+            //     );
+            //     console.log(
+            //         `   Width: ${post.imageWidth ? post.imageWidth + "px" : "Không xác định"}`,
+            //     );
+            // });
 
             return res.status(200).json({
                 success: true,
