@@ -21,7 +21,7 @@ class NewsJobService {
 
             // 1. Lấy tin tức từ website
             const posts = await this.fetchNewsFromWebsite();
-            console.log(`Tìm thấy ${posts.length} bài viết từ website`);
+            // console.log(`Tìm thấy ${posts.length} bài viết từ website`);
 
             // 2. Xử lý và lưu vào database
             const result = await this.processAndSavePosts(posts);
@@ -268,8 +268,8 @@ class NewsJobService {
                     ) || 0,
             };
 
-            console.log(`Có hình ảnh: ${imageStats.hasImage}`);
-            console.log(`Chiều rộng trung bình: ${imageStats.averageWidth}px`);
+            // console.log(`Có hình ảnh: ${imageStats.hasImage}`);
+            // console.log(`Chiều rộng trung bình: ${imageStats.averageWidth}px`);
 
             return posts;
         } catch (error) {
