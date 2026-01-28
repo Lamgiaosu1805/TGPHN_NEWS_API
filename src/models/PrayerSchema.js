@@ -1,15 +1,31 @@
 const mongoose = require('mongoose');
 
 const PrayerSchema = new mongoose.Schema({
-    title: String,
-    html: String,
+    title: {
+        type: String,
+        required: true
+    },
+    html: {
+        type: String,
+        required: true
+    },
+    plainText: {
+        type: String,
+        default: ''
+    },
     group: String
 }, {
-    // Chỉ định chính xác tên collection đã có trong DB của bạn
-    collection: 'kinh-nguyen'
+    collection: 'kinh-nguyen',
+    timestamps: true
 });
 
-// Tạo index để tìm kiếm nhanh theo tiêu đề
-PrayerSchema.index({ title: 'text' });
+/**
+ * Text index cho AI + search
+ * title + plainText
+ */
+PrayerSchema.index({
+    title: 'text',
+    plainText: 'text'
+});
 
 module.exports = mongoose.model('Prayer', PrayerSchema);

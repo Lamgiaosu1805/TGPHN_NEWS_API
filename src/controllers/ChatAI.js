@@ -12,7 +12,7 @@ const ChatAIController = {
     tools: [{
         functionDeclarations: [{
             name: "find_prayer_in_db",
-            description: "Tra cứu nội dung kinh nguyện hoặc nghi thức trong database.",
+            description: "Tra cứu nội dung kinh nguyện trong database.",
             parameters: {
                 type: "OBJECT",
                 properties: {
@@ -50,7 +50,7 @@ const ChatAIController = {
 
             const model = genAI.getGenerativeModel({
                 // Đổi sang 1.5-flash để tránh lỗi cạn kiệt quota 20 lượt của bản 2.5
-                model: "gemini-2.5-flash",
+                model: "gemini-2.5-flash-lite",
                 tools: ChatAIController.tools,
                 systemInstruction: `Con là "Trợ lý AI TGP Hà Nội".
                 QUY TẮC PHẢN HỒI:
