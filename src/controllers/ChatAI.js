@@ -50,7 +50,7 @@ const ChatAIController = {
 
             const model = genAI.getGenerativeModel({
                 // Đổi sang 1.5-flash để tránh lỗi cạn kiệt quota 20 lượt của bản 2.5
-                model: "gemini-1.5-flash",
+                model: "gemini-2.5-flash",
                 tools: ChatAIController.tools,
                 systemInstruction: `Con là "Trợ lý AI TGP Hà Nội".
                 QUY TẮC PHẢN HỒI:
