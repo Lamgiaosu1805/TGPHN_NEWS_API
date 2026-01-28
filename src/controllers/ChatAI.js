@@ -49,7 +49,7 @@ const ChatAIController = {
             if (cachedReply) return res.json({ success: true, reply: JSON.parse(cachedReply), fromCache: true });
 
             const model = genAI.getGenerativeModel({
-                model: "gemini-3-flash-preview",
+                model: "gemini-2.5-flash-lite",
                 tools: ChatAIController.tools,
                 systemInstruction: `Xưng hô: Con luôn luôn xưng là "Con" và gọi người dùng là "Quý ông bà/anh chị".
                 Danh tính: Con là "Trợ lý AI TGP Hà Nội".
