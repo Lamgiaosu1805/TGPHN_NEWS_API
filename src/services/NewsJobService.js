@@ -308,6 +308,10 @@ class NewsJobService {
                         existingPost,
                         postData,
                     );
+                    // if (postData.postId === "278938") {
+                    //     console.log("existingPost:", existingPost);
+                    //     console.log("postData", postData)
+                    // }
 
                     if (shouldUpdate) {
                         // Cập nhật bài viết
@@ -326,7 +330,7 @@ class NewsJobService {
 
                         // Nếu thời gian đăng khác (bài được đăng lại)
                         if (
-                            existingPost.parsedDate.getTime() !==
+                            existingPost.lastPublishedAt.getTime() !==
                             postData.parsedDate.getTime()
                         ) {
                             existingPost.lastPublishedAt = postData.parsedDate;
@@ -365,20 +369,19 @@ class NewsJobService {
     async shouldUpdatePost(existingPost, newPostData) {
         // 1. Kiểm tra nếu thời gian đăng khác nhau
         const hasDifferentTime =
-            existingPost.parsedDate.getTime() !== newPostData.parsedDate.getTime();
+            existingPost.lastPublishedAt.getTime() !== newPostData.parsedDate.getTime();
 
         // 2. Kiểm tra nếu có thông tin thay đổi quan trọng
-        const hasChangedContent =
-            existingPost.title !== newPostData.title ||
-            existingPost.category !== newPostData.category ||
-            existingPost.excerpt !== newPostData.excerpt ||
-            existingPost.image !== newPostData.image ||
-            existingPost.imageWidth !== newPostData.imageWidth;
+        // const hasChangedContent =
+        //     existingPost.title !== newPostData.title ||
+        //     existingPost.category !== newPostData.category ||
+        //     existingPost.excerpt !== newPostData.excerpt ||
+        //     existingPost.image !== newPostData.image ||
+        //     existingPost.imageWidth !== newPostData.imageWidth;
 
-        // 3. Nếu thời gian khác nhau HOẶC có thay đổi nội dung HOẶC ảnh nhỏ hơn
-        const hasSmallerImage = existingPost.imageWidth < newPostData.imageWidth;
-
-        return hasDifferentTime || hasChangedContent || hasSmallerImage;
+        // // 3. Nếu thời gian khác nhau HOẶC có thay đổi nội dung HOẶC ảnh nhỏ hơn
+        // const hasSmallerImage = existingPost.imageWidth < newPostData.imageWidth;
+        return hasDifferentTime
     }
 
     // ========== HELPER METHODS (GIỐNG CONTROLLER) ==========
