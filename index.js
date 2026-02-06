@@ -26,7 +26,7 @@ route(app);
     await db.connect();
 
     // Import cron job sau khi DB connect
-    // require("./src/jobs/scheduleNotification");
+    require("./src/jobs/scheduleNotification");
     require("./src/jobs/newsJob").start();
 
     const port = process.env.PORT || 3456;
