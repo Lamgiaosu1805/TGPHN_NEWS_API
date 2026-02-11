@@ -18,7 +18,7 @@ cron.schedule("30 7 * * *", async () => {
             return;
         }
 
-        const bodyText = `${data.cau_loi_chua} (${data.tin_mung})`;
+        const bodyText = `${data.cau_loi_chua}. (${data.tin_mung})`;
 
         await axios.post(PUSH_API, {
             title: data.title,
