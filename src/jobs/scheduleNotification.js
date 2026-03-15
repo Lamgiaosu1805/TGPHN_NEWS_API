@@ -24,8 +24,10 @@ cron.schedule("30 7 * * *", async () => {
             title: data.title,
             body: bodyText,
             data: {
-                type: "lich_cong_giao",
+                type: "mass-readings",
                 date: today,
+                screen: "Home",
+                dateKey: today,
             },
         });
 
